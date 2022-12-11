@@ -37,12 +37,6 @@ async function populateDatabase() {
   return false
 }
 
-// elastic.esclient.count({
-//   index: elastic.index
-//   }).then(res => {
-//     console.log(res.count);})
-//     .catch(err => {
-//       console.log(err)});
 
 module.exports = {
   populateDatabase

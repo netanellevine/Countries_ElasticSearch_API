@@ -111,20 +111,20 @@ async function getCountry(req, res) {
     type: type,
     body: query
 }).then(function ({ body: { hits } }) {
-    const results = hits.total.value;
-    const values  = hits.hits.map((hit) => {
+    const amount = hits.total.value;
+    if (amount == 0) throw TypeError;
+    const data  = hits.hits.map((hit) => {
       return {
         id:     hit._id,
         country:  hit._source.name,
         type: hit._source.geometry.type,
-        score:  hit._score
       };
     });
-    res.status(200).json({success: true, data: {results, values}});
+    res.status(200).json({success: true, amount, data});
 }, function (error) {
     console.trace(error.message);
 }).catch((err) => {
-  res.status(500).json({ success: false, error: "Get country failed -> Unknown error."});
+  res.status(404).json({ success: false, error: "Get country failed -> couldn't find the country in the database."});
 });
 }
 
@@ -162,23 +162,24 @@ async function getCountryFromName(req, res) {
     index: index,
     type: type,
     body: query
-}).then(function ({ body: { hits } }) {
-    const results = hits.total.value;
-    const values  = hits.hits.map((hit) => {
+  }).then(function ({ body: { hits } }) {
+    const amount = hits.total.value;
+    if (amount == 0) throw TypeError;
+    const data  = hits.hits.map((hit) => {
       return {
         id:     hit._id,
         country:  hit._source.name,
         type: hit._source.geometry.type,
-        score:  hit._score
       };
     });
-    res.status(200).json({success: true, data: {results, values}});
+    res.status(200).json({success: true, status: 200, amount, data});
 }, function (error) {
     console.trace(error.message);
 }).catch((err) => {
-  res.status(500).json({ success: false, error: "Get country failed -> Unknown error."});
+  res.status(404).json({ success: false, status: 404, error: "Get country failed -> couldn't find the country in the database."});
 });
 }
+
 
 
 
@@ -199,14 +200,20 @@ async function deleteCountry (req, res, next) {
           }
       }
 }).then(function (response) {
-  const values  = {
+  const data  = {
         took:     response.body.took,
         timed_out: response.body.timed_out,
+        amount: response.body.deleted,
         deleted: (response.body.deleted == 1),
         country:  req.body.name,
         message: `${req.body.name} removed from the index.`
     };
-    res.status(200).json({success: true, data: {values}});
+    if (response.body.deleted == 0) {
+      data.message = `${req.body.name} was not removed from the index.`;
+      res.status(404).json({success: false, status: 404, data});
+    } else {
+      res.status(200).json({success: true,  status: 200, data});
+    }
   }, function (error) {
       console.trace(error.message)
   }).catch((err) => {
@@ -232,7 +239,7 @@ async function insertNewCountry (req, res, next) {
             geometry: req.body.geometry
       }
     }).then(function (response) {
-      const values  = {
+      const data  = {
             index: response.body._index,
             type: response.body._type,
             id: response.body._id,
@@ -241,7 +248,12 @@ async function insertNewCountry (req, res, next) {
             country:  req.body.name,
             message: `${req.body.name} sucessfully added to the index.`
         };
-        res.status(200).json({success: true, data: {values}});
+        if (response.body.result != 'created') {
+          data.message = `${req.body.name} was not  sucessfully added to the index.`;
+          res.status(400).json({success: false, status: 400, data});
+        } else {
+          res.status(200).json({success: true, status: 200, data});
+        }
   }, function (error) {
       console.trace(error.message)
   }).catch((err) => {

@@ -5,7 +5,7 @@ services:
   api:
     image: node:19-alpine3.15
     build: ./node_data/
-    container_name: tgd-node
+    container_name: node-api
     restart: always
     ports:
       - 3000:3000
@@ -25,7 +25,7 @@ services:
       - esnet
 
   Elasticsearch:
-    container_name: tgd-elasticsearch
+    container_name: elasticsearch-db
     image: elasticsearch:7.16.2
     restart: always
     volumes:
@@ -44,15 +44,17 @@ services:
 
   Logstash:
     image: logstash:7.16.2
-    container_name: tgd-logstash
+    container_name: logstash
     restart: always
     volumes:
     - ./logstash/:/logstash_dir
     command: logstash -f /logstash_dir/logstash.conf 
+    logging: 
+      driver: "none"     
     depends_on:
       - Elasticsearch
     ports:
-    - '9600:9600'
+      - '9600:9600'
     environment:
       - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
     networks:
@@ -60,10 +62,12 @@ services:
 
   Kibana:
     image: kibana:7.16.2
-    container_name: tgd-kibana
-    restart: always       
+    container_name: kibana
+    restart: always
+    logging: 
+      driver: "none"       
     ports:
-    - '5601:5601'
+      - '5601:5601'
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200  
     depends_on:
@@ -74,9 +78,8 @@ services:
   Python:
     image: python:3.10-slim
     build: ./python_cli/
-    container_name: tgd-python
-    command: sh -c "sleep 15s"
-    stdin_open: true
+    container_name: python-cli
+    # entrypoint: ["sh", "-c", "docker" , "up" , "exec", "-it", "python-cli", "bash"]
     tty: true
     depends_on:
       - api

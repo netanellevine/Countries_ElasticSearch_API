@@ -1,79 +1,157 @@
-import time
+import argparse
 import requests
+import json
 import sys
 
-IP = 'http://localhost'
+ENDPOINT = 'http://api'
 PORT = 3000
 DATABASE = 'countries'
+HEADERS = {"Content-Type": "application/json"}
+
 params = sys.argv
-getFromCoordinates = 'http://localhost:3000/countries/country?text={"coordinates":{"lon":12.9,"lat":-4.78}}'
-getFromName = 'http://localhost:3000/countries/id?text=Israel'
-populate = 'http://localhost:3000/countries/populate'
-delete = 'http://localhost:3000/countries/delete?text=israel'
 
-# print(len(sys.argv))
-# print(str(sys.argv))
-# print("The value of __name__ is:", repr(__name__))
+# my location -  lon: 35.212 lat: 31.803
 
-# response = requests.get(second)
-# print(response.json()['data']['values'][0]['country'])
-# print(response.json()['data']['values'][0]['id'])
-# print(response.json())
 
-# getFromCoordinates = f'{BASE}/{DATABASE}/country?text={"coordinates":{"lon":12.9,"lat":-4.78}}'
-# getFromName = 'http://localhost:3000/countries/id?text=Israel'
+
+def print_allUSAGE():
+    print("USAGE: python3 app.py populate   ->  Use to populate the databse")
+    print("OR:    python3 app.py clear      ->  Use to remove all the documents from the database")
+    print("OR:    python3 app.py get <longitude> <latitude>   ->  Use to get a country from a point")
+    print("OR:    python3 app.py get <country_name>           ->  Use to get a country from a name")
+    print("OR:    python3 app.py delete <country_name>        ->  Use to delete a country")
+    print("OR:    python3 app.py add -n <country_name> -s <type_of_shape> -c <list_of_coordinates   ->  Use to add a new country \nFor example python3 app.py add -n Mobileye -s LineString -c [[35.221, 31.803],[35.01, 31.2]]\n\n")
+    
+
+
+def print_respone(res):
+    print(json.dumps(res.json(), indent=4))
+
+
 
 def populateDB():
-    response = requests.get(f'{IP}:{PORT}/{DATABASE}/data/start')
-    time.sleep(2)
-    print(response.json())
+    if len(params) == 2:
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text=israel'
+        response = requests.get(url, timeout=6).json()['success']
+        if response == 'false':
+            url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
+            response = requests.get(url, timeout=6)
+            print_respone(response)
+        else:
+            response = '''{
+                "success": "false",
+                "error": "Database is already populated"
+            }'''
+            print_respone(json.loads(response))
+    else:
+      print("Too much arguments!\n USAGE: python3 app.py populate \n\n")  
+
+
 
 def clearDB():
-    response = requests.get(f'{IP}:{PORT}/{DATABASE}/data/clear')
-    time.sleep(2)
-    print(response.json())
+    if len(params) == 2:
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/clear'
+        response = requests.get(url, timeout=6)
+        print_respone(response)
+    else:
+      print("Too much arguments!\n USAGE: python3 app.py clear \n\n")  
 
 
 
 def getCountry():
     if len(params) == 3:  # get by country name
 
-        if params[2] is None or len(params[2]) < 3:
-            print("Name is too short!")
-            return
-        
-        request = f'{IP}:{PORT}/{DATABASE}/search/name?text={params[2]}' # todo: change to name
-        response = requests.get(request)
-        print(response.json())
+        if params[2] is None or len(params[2]) < 3 or not params[2].replace(" ", "").isalpha():
+                print("ERROR with get country!")
+                print("USAGE: python3 app.py get <country_name>\nOR:    python3 app.py get <longitude> <latitude>\n\n")
+                return
+
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text={params[2]}'
+        response = requests.get(url, timeout=6)
+        print_respone(response)
 
     elif len(params) == 4:  # get by coordinates
         # todo: add verification maybe
         coordinates = f'{{"coordinates":{{"lon":{float(params[2])},"lat":{float(params[3])}}}}}'
-        request = f'{IP}:{PORT}/{DATABASE}/search/point?text={coordinates}' # todo: change to coordinates
-        response = requests.get(request)
-        print(response.json())
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/point?text={coordinates}'
+        response = requests.get(url, timeout=6)
+        print_respone(response)
     
     else:
-        print("USAGE: python3 app.py get <country_name>\nOR:    python3 app.py get <longitude> <latitude>")
+        print("USAGE: python3 app.py get <country_name>\nOR:    python3 app.py get <longitude> <latitude>\n\n")
 
     
 
-
 def addCountry():
-    pass
+    name = shape = coords = last =''
+
+    # Extract the args to their matching names
+    for i in range(len(params[1:])):
+        if last == '-n':
+            name = params[i]
+        elif last == '-s':
+            shape = params[i]
+        elif last == '-c':
+            coords = "".join(params[i:])
+            break
+        last = params[i]
+
+    coordinates = []
+    coords = coords[1:-1]
+    ind = 0
+    # Parse the coordinates to a list of floats
+    while ind < len(coords):
+        curr = coords[ind]
+        if curr == '[':
+            curr = ''
+            temp = coords[ind + 1] 
+            while temp != ']':
+                curr += temp
+                ind += 1
+                temp = coords[ind + 1] 
+            res = [float(idx) for idx in curr.split(',')]
+            coordinates.append(res)
+        ind += 1
+
+    body = {
+        "_index": DATABASE,
+        "_type": "_doc",
+        "name": name.lower(),
+        "geometry":
+        {
+            "type": shape.capitalize(),
+            "coordinates": coordinates
+        }
+    }
+    
+    url = f'{ENDPOINT}:{PORT}/{DATABASE}/insert/single/data'
+    response = requests.post(url, json=body, timeout=6)
+    print_respone(response)
+
 
 
 def deleteCountry():
-    pass
+    if len(params) == 3:
+        body = json.dumps({"name": params[2]})
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/delete/data'
+        response = requests.delete(url, data=body, headers=HEADERS, timeout=6)
+        print_respone(response)
+    else:
+      print("ERROR with delete country!\nUSAGE: python3 app.py delete  <country_name>\n\n")  
+
 
 
 def main():
 
     if len(params) < 2:
         print("You must specify your request!")
+        print_allUSAGE()
         exit(1)
     
     match params[1].lower():
+        case '--help':
+            print_allUSAGE()
+            return
         case 'populate':
             populateDB()
             return
@@ -96,6 +174,7 @@ def main():
 
         case default:
             print("An error occured!")
+            print_allUSAGE()
             return
 
 

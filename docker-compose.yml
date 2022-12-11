@@ -4,9 +4,9 @@ services:
 
   api:
     image: node:19-alpine3.15
+    build: ./node_data/
     container_name: tgd-node
     restart: always
-    build: .
     ports:
       - 3000:3000
     environment:
@@ -68,6 +68,18 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200  
     depends_on:
       - Elasticsearch  
+    networks:
+      - esnet
+  
+  Python:
+    image: python:3.10-slim
+    build: ./python_cli/
+    container_name: tgd-python
+    command: sh -c "sleep 15s"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - api
     networks:
       - esnet
 

@@ -12,8 +12,8 @@ async function deleteIndex(){
   await esclient.indices.delete({index: index})
   .then(function(resp) {
     console.log("##################################################################");
-    console.log("Deleting the index was successful");
-    console.log(JSON.stringify(resp.body, null, 4));
+    console.log(`Successfully deleted the index: ${index}`);
+    // console.log(JSON.stringify(resp.body, null, 4));
     console.log("##################################################################");
   }, function(err) {
     console.log("##################################################################");
@@ -33,7 +33,7 @@ async function createIndex() {
   try {
     await esclient.indices.create({index: index });
     console.log("##################################################################");
-    console.log(`Created index ${index}`);
+    console.log(`Successfully created the index: ${index}`);
     console.log("##################################################################");
   } catch (err) {
     esclient.indices.delete({index: index});

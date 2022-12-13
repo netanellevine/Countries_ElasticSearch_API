@@ -3,7 +3,7 @@ version: '3.6'
 services:
 
   api:
-    image: node:19-alpine3.15
+    image: node_elastic_api
     build: ./node_data/
     container_name: node-api
     restart: always
@@ -76,12 +76,11 @@ services:
       - esnet
   
   Python:
-    image: python:3.10-slim
+    image: python_cli_api
     build: ./python_cli/
     container_name: python-cli
     logging:
       driver: none
-    # entrypoint: ["sh", "-c", "docker" , "up" , "exec", "-it", "python-cli", "bash"]
     tty: true
     depends_on:
       - api

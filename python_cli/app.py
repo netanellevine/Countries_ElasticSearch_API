@@ -30,9 +30,6 @@ def print_respone(res):
 
 
 def populateDB():
-    # url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
-    # response = requests.get(url, timeout=6)
-    # print_respone(response)
     if len(params) == 2:
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text=israel'
         response = requests.get(url, timeout=6).json()

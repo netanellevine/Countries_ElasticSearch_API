@@ -20,7 +20,7 @@ function startServer() {
              .use(bodyParser.json())
              .use("/countries",API.app)
              .use((_req, res) => res.status(404).json({ success: false,error: "Route not found" }))
-             .listen(port, () => console.log(`Server ready on port ${port}`));
+             .listen(port, () => console.log(`Server ready on port ${port}.\nStarted to listen...`));
 }
 
 

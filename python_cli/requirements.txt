@@ -57,7 +57,7 @@ aniso8601==8.0.0
 # pyxdg==0.27
 # PyYAML==5.4.1
 # reportlab==3.6.8
-# requests
+requests
 # roman==3.3
 # rsa==3.1.2
 # s3transfer

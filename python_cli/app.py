@@ -30,19 +30,22 @@ def print_respone(res):
 
 
 def populateDB():
+    # url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
+    # response = requests.get(url, timeout=6)
+    # print_respone(response)
     if len(params) == 2:
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text=israel'
-        response = requests.get(url, timeout=6).json()['success']
-        if response == 'false':
+        response = requests.get(url, timeout=6).json()
+        if response['success'] == False:
             url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
             response = requests.get(url, timeout=6)
             print_respone(response)
         else:
-            response = '''{
+            response ={
                 "success": "false",
                 "error": "Database is already populated"
-            }'''
-            print_respone(json.loads(response))
+            }
+            print(json.dumps(response, indent=4))
     else:
       print("Too much arguments!\n USAGE: python3 app.py populate \n\n")  
 
@@ -147,35 +150,38 @@ def main():
         print("You must specify your request!")
         print_allUSAGE()
         exit(1)
-    
-    match params[1].lower():
-        case '--help':
-            print_allUSAGE()
-            return
-        case 'populate':
-            populateDB()
-            return
+    try:
+        match params[1].lower():
+            case '--help':
+                print_allUSAGE()
+                return
+            case 'populate':
+                populateDB()
+                return
 
-        case 'clear':
-            clearDB()
-            return
+            case 'clear':
+                clearDB()
+                return
 
-        case 'add':
-            addCountry()
-            return
+            case 'add':
+                addCountry()
+                return
 
-        case 'get':
-            getCountry()
-            return
+            case 'get':
+                getCountry()
+                return
 
-        case 'delete':
-            deleteCountry()
-            return
+            case 'delete':
+                deleteCountry()
+                return
 
-        case default:
-            print("An error occured!")
-            print_allUSAGE()
-            return
+            case default:
+                print("An error occured!")
+                print_allUSAGE()
+                return
+    except ConnectionError or ConnectionRefusedError:
+        print(ConnectionError)
+        print("Connection refused!")
 
 
 if __name__ == "__main__":

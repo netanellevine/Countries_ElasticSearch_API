@@ -19,7 +19,7 @@ async function populateDB(req, res) {
   if (!req.query.text) {
     const done = await data.populateDatabase();
     if (done) {
-      res.status(201).json({ success: true, data: "Database populated." });
+      res.status(201).json({ success: true, status: 201, data: "Database populated." });
       return;
     }
   }
@@ -57,7 +57,7 @@ async function clearIndex (req, res, next) {
       deleted: response.body.deleted,
       message: `${index} index cleared succsesfully.`
     };
-  res.status(200).json({success: true, data: {values}});
+  res.status(200).json({success: true, status: 200, data: {values}});
 }, function (error) {
     console.trace(error.message)
 }).catch((err) => {
@@ -120,11 +120,11 @@ async function getCountry(req, res) {
         type: hit._source.geometry.type,
       };
     });
-    res.status(200).json({success: true, amount, data});
+    res.status(200).json({success: true, status: 200, amount, data});
 }, function (error) {
     console.trace(error.message);
 }).catch((err) => {
-  res.status(404).json({ success: false, error: "Get country failed -> couldn't find the country in the database."});
+  res.status(404).json({ success: false, status: 404, error: "Get country failed -> couldn't find the country in the database."});
 });
 }
 
@@ -244,7 +244,7 @@ async function insertNewCountry (req, res, next) {
             type: response.body._type,
             id: response.body._id,
             result: response.body.result,
-            "sequence number": response._seq_no,
+            sequence_number: response._seq_no,
             country:  req.body.name,
             message: `${req.body.name} sucessfully added to the index.`
         };

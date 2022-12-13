@@ -79,6 +79,8 @@ services:
     image: python:3.10-slim
     build: ./python_cli/
     container_name: python-cli
+    logging:
+      driver: none
     # entrypoint: ["sh", "-c", "docker" , "up" , "exec", "-it", "python-cli", "bash"]
     tty: true
     depends_on:

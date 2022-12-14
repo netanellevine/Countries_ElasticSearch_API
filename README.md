@@ -20,7 +20,12 @@ After you see the lines:
 Server ready on port 3000.  
 Started to listen...
 ```
-It means that now the dockers are connected within their inner network and we can start.   
+It means that now the dockers are connected within their inner network and we can start.
+
+### There are 3 ways you can interact with the database:
+1) Python CLI - Command Line Interface
+2) Web browser to the database
+3) Kibana - Easy and user friendly way to interact with the database
 
 Now we need to open a new terminal window, in the cuurent terminal window click:  
 ```

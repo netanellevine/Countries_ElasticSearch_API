@@ -64,13 +64,13 @@ those operations you must use the Postman extension.
 Type the same url as mentioned above.   
 In the **HEADER** section put as the key ```Content-Type``` and the value ```application/json```.  
 Now let's move to the body.   
-For **DELETE** the body should look like this format for example:
+For **DELETE** requests the body should look like this format for example:
 ```
 {
 "name": "angola"
 }
 ```
-For **POST** the body should look like this format for example:
+For **POST** requests the body should look like this format for example:
 ```
 {
 	"_index": "countries",

@@ -34,21 +34,28 @@ The domain is: ```http://localhost:3000``` .
 The index name is: ```countries``` .  
 Now you can choose which requests you want to perform.   
 To **POPULATE** the database with the countries:
-* 
 ```
 http://localhost:3000/countries/data/start
 ```  
 
 To **CLEAR** the database from the countries:
-* ```http://localhost:3000/countries/data/clear```  
+ ```
+ http://localhost:3000/countries/data/clear
+ ```  
 
 To **COUNT** the amount of countries in the database:
 * ```http://localhost:3000/countries/count```  
 
 For **GET** requests you need to add ```/search``` after the port number and then to choose between  
 ```/point``` or ```/name``` and add the desired query as text for example:
-* ```http://localhost:3000/countries/search/name?text=israel``` to search by a given name.  
-* ```http://localhost:3000/countries/search/point?text={"coordinates":{"lon":12.9,"lat":-4.78}}``` to search by a given coordinates.  
+```
+http://localhost:3000/countries/search/name?text=israel
+``` 
+to search by a given name.  
+```
+http://localhost:3000/countries/search/point?text={"coordinates":{"lon":12.9,"lat":-4.78}}
+``` 
+to search by a given coordinates.  
 
 The **DELETE** and **POST** requests can't be done with the web browser because those requests should have body, so for   
 those operations you must use the Postman extension.

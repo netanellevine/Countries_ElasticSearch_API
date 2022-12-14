@@ -6,7 +6,7 @@ ___
 Let's begin with cloning the repository.
 
 ```
-git clone https://github.com/netanellevine/countries_ElasticSearch_AP && cd countries_ElasticSearch_AP
+git clone https://github.com/netanellevine/countries_ElasticSearch_API && cd countries_ElasticSearch_API
 ```
 
 Then we would like to download and build the docker images:

@@ -1,7 +1,7 @@
 # Countries_ElasticSearch_API
 
 ___
-## How to use
+# How to use
 
 Let's begin with cloning the repository.
 
@@ -27,7 +27,7 @@ It means that now the dockers are connected within their inner network and we ca
 2) **Web browser/Postman** to the database
 3) **Kibana** - Easy and user friendly way to interact with the database
 _____
-### Web browser
+## Web browser
 In order to use this option you can go to your default web browser or download **Postman** extension.  
 
 The domain is: ```http://localhost:3000``` .  
@@ -89,7 +89,7 @@ After clicking **send** you would see the response whether it was **sucesss** or
 
 
 _____
-### Python CLI
+## Python CLI
 In order to use this option you need to have a python installed in your PC.  
 Now you need to open a new terminal window, in the cuurent terminal window click:  
 ```

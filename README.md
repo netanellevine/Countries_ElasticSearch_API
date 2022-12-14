@@ -32,11 +32,12 @@ In the new terminal type:
 docker exec -it python-cli bash
 ```
 You will immediately see that now your path looks different this is because you are now working inside the ```python_cli``` terminal.   
-To start you need to choose one of the following commands:
+To start you need to choose one of the following commands:   
+
+->  Use to get the correct usage and syntax for this API
 ```
-python3 app.py 
+python3 app.py --help
 ```
-and choose one of the following:   
 ->  Use to populate the databse
 ```
 python3 app.py populate 
@@ -44,6 +45,10 @@ python3 app.py populate
 ->  Use to remove all the documents from the database
 ```
 python3 app.py clear      
+```
+->  Use to get the amount of countries in the DB
+```
+python3 app.py count
 ```
 ->  Use to get a country from a point
 ```

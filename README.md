@@ -44,7 +44,9 @@ To **CLEAR** the database from the countries:
  ```  
 
 To **COUNT** the amount of countries in the database:
-* ```http://localhost:3000/countries/count```  
+```
+http://localhost:3000/countries/count
+```  
 
 For **GET** requests you need to add ```/search``` after the port number and then to choose between  
 ```/point``` or ```/name``` and add the desired query as text for example:

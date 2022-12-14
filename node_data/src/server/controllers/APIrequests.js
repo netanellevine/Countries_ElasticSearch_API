@@ -20,7 +20,7 @@ async function populateDB(req, res) {
     esclient.count({index: index,type: type})
     .then(function (response) {
       COUNT_DOCS = response.body.count;
-      if (COUNT_DOCS == 178) {
+      if (COUNT_DOCS > 0) {
         res.status(403).json({success: false, status: 403, error: `${index} index is already populated.`});
         return;
       }
@@ -70,13 +70,13 @@ async function clearIndex (req, res, next) {
           }
       }
     }).then(function (response) {
-      const values  = {
+      const data  = {
           took:     response.body.took,
           timed_out: response.body.timed_out,
           deleted: response.body.deleted,
           message: `${index} index cleared succsesfully.`
         };
-      res.status(200).json({success: true, status: 200, data: {values}});
+      res.status(200).json({success: true, status: 200, data});
     }, function (error) {
         console.trace(error.message)
       }).catch((err) => {
@@ -129,6 +129,10 @@ async function getCountry(req, res) {
       status: 400,
       data: "Missing required parameter: text"
     });
+    return;
+  }
+  if (COUNT_DOCS == 0) {
+    res.status(403).json({success: false, status: 403, error: `Can't perform GET, ${index} index is empty.`});
     return;
   }
   const q = JSON.parse(req.query.text);
@@ -196,7 +200,10 @@ async function getCountryFromName(req, res) {
 
     return;
   }
-
+  if (COUNT_DOCS == 0) {
+    res.status(403).json({success: false, status: 403, error: `Can't perform GET, ${index} index is empty.`});
+    return;
+  }
   const query = {
     query: {
       query_string: {
@@ -238,6 +245,10 @@ async function getCountryFromName(req, res) {
  * @returns 
  */
 async function deleteCountry (req, res, next) {
+  if (COUNT_DOCS == 0) {
+    res.status(403).json({success: false, status: 403, error: `Can't perform DELETE, ${index} index is empty.`});
+    return;
+  }
   return esclient.deleteByQuery({
       index: index,
       type: type,
@@ -259,6 +270,7 @@ async function deleteCountry (req, res, next) {
       data.message = `${req.body.name} was not removed from the index.`;
       res.status(400).json({success: false, status: 400, data});
     } else {
+      COUNT_DOCS -= 1;
       res.status(200).json({success: true,  status: 200, data});
     }
   }, function (error) {
@@ -299,6 +311,7 @@ async function insertNewCountry (req, res, next) {
           data.message = `${req.body.name} was not  sucessfully added to the index.`;
           res.status(400).json({success: false, status: 400, data});
         } else {
+          COUNT_DOCS += 1;
           res.status(201).json({success: true, status: 201, data});
         }
   }, function (error) {

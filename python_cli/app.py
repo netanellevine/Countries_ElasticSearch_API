@@ -17,6 +17,7 @@ params = sys.argv
 def print_allUSAGE():
     print("USAGE: python3 app.py populate   ->  Use to populate the databse")
     print("OR:    python3 app.py clear      ->  Use to remove all the documents from the database")
+    print("OR:    python3 app.py count      ->  Use to get the amount of countries in the DB")
     print("OR:    python3 app.py get <longitude> <latitude>   ->  Use to get a country from a point")
     print("OR:    python3 app.py get <country_name>           ->  Use to get a country from a name")
     print("OR:    python3 app.py delete <country_name>        ->  Use to delete a country")
@@ -32,7 +33,7 @@ def print_respone(res):
 def populateDB():
     if len(params) == 2:
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
-        response = requests.get(url, timeout=6)
+        response = requests.get(url, timeout=10)
         print_respone(response)
     else:
       print("Too much arguments!\n USAGE: python3 app.py populate \n\n")  
@@ -42,7 +43,7 @@ def populateDB():
 def clearDB():
     if len(params) == 2:
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/clear'
-        response = requests.get(url, timeout=6)
+        response = requests.get(url, timeout=10)
         print_respone(response)
     else:
       print("Too much arguments!\n USAGE: python3 app.py clear \n\n")  
@@ -58,14 +59,14 @@ def getCountry():
                 return
 
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text={params[2]}'
-        response = requests.get(url, timeout=6)
+        response = requests.get(url, timeout=10)
         print_respone(response)
 
     elif len(params) == 4:  # get by coordinates
         # todo: add verification maybe
         coordinates = f'{{"coordinates":{{"lon":{float(params[2])},"lat":{float(params[3])}}}}}'
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/point?text={coordinates}'
-        response = requests.get(url, timeout=6)
+        response = requests.get(url, timeout=10)
         print_respone(response)
     
     else:
@@ -116,7 +117,7 @@ def addCountry():
     }
     
     url = f'{ENDPOINT}:{PORT}/{DATABASE}/insert/single/data'
-    response = requests.post(url, json=body, timeout=6)
+    response = requests.post(url, json=body, timeout=10)
     print_respone(response)
 
 
@@ -125,10 +126,20 @@ def deleteCountry():
     if len(params) == 3:
         body = json.dumps({"name": params[2]})
         url = f'{ENDPOINT}:{PORT}/{DATABASE}/delete/data'
-        response = requests.delete(url, data=body, headers=HEADERS, timeout=6)
+        response = requests.delete(url, data=body, headers=HEADERS, timeout=10)
         print_respone(response)
     else:
       print("ERROR with delete country!\nUSAGE: python3 app.py delete  <country_name>\n\n")  
+
+
+
+def countCountries():
+    if len(params) == 2:
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/count'
+        response = requests.get(url, timeout=10)
+        print_respone(response)
+    else:
+        print("Too much arguments!\n USAGE: python3 app.py count \n\n")  
 
 
 
@@ -162,14 +173,19 @@ def main():
             case 'delete':
                 deleteCountry()
                 return
+            
+            case 'count':
+                countCountries()
+                return
 
             case default:
                 print("An error occured!")
                 print_allUSAGE()
                 return
-    except ConnectionError or ConnectionRefusedError:
+    except:
         print(ConnectionError)
         print("Connection refused!")
+        print("Wait for the connection to be ready!")
 
 
 if __name__ == "__main__":

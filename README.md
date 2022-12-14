@@ -61,7 +61,7 @@ to search by a given coordinates.
 
 The **DELETE** and **POST** requests can't be done with the web browser because those requests should have body, so for   
 those operations you must use the Postman extension.
-Type the same url as mentioned above.
+Type the same url as mentioned above.   
 In the **HEADER** section put as the key ```Content-Type``` and the value ```application/json```.  
 Now let's move to the body.   
 For **DELETE** the body should look like this format for example:

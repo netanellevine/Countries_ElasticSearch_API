@@ -36,7 +36,7 @@ To start you need to choose one of the following commands:
 ```
 python3 app.py 
 ```
-and choose one of the following:
+and choose one of the following:   
 ->  Use to populate the databse
 ```
 python3 app.py populate 

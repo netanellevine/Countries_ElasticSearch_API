@@ -34,7 +34,10 @@ The domain is: ```http://localhost:3000``` .
 The index name is: ```countries``` .  
 Now you can choose which requests you want to perform.   
 To **POPULATE** the database with the countries:
-* ```http://localhost:3000/countries/data/start```  
+* 
+```
+http://localhost:3000/countries/data/start
+```  
 
 To **CLEAR** the database from the countries:
 * ```http://localhost:3000/countries/data/clear```  

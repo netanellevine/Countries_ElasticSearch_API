@@ -107,31 +107,31 @@ To start you need to choose one of the following commands:
 ```
 python3 app.py --help
 ```
-->  Use to populate the databse
+->  Use to **POPULATE** the databse
 ```
 python3 app.py populate 
 ```
-->  Use to remove all the documents from the database
+->  Use to **CLEAR** all the documents from the database
 ```
 python3 app.py clear      
 ```
-->  Use to get the amount of countries in the DB
+->  Use to **COUNT** the amount of countries in the DB
 ```
 python3 app.py count
 ```
-->  Use to get a country from a point
+->  Use to **GET** a country from a point
 ```
 python3 app.py get <longitude> <latitude>
 ```
- ->  Use to get a country from a name
+ ->  Use to **GET** a country from a name
 ```
 python3 app.py get <country_name>
 ```
-->  Use to delete a country
+->  Use to **DELETE** a country
 ```
 python3 app.py delete <country_name>
 ```
-->  Use to add a new country 
+->  Use to **POST** a new country 
 ```
 python3 app.py add -n <country_name> -s <type_of_shape> -c <list_of_coordinates 
 ```

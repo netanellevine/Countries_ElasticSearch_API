@@ -1,7 +1,6 @@
-const { chmodSync } = require("fs");
 const data = require("../../data");
 const { esclient, index, type } = require("../../elastic");
-
+var COUNT_DOCS = 0;
 
 /** The controlles duty is to pass the requests that arrived
  * from the API through the router to the DB after validating the requests.
@@ -11,22 +10,35 @@ const { esclient, index, type } = require("../../elastic");
 
 /**
  * @function populateDB
+ * This function populates the database with the 178 countries in the countries.geo.json file.
  * @param {*} req 
  * @param {*} res 
  * @returns 
  */
 async function populateDB(req, res) {
   if (!req.query.text) {
-    const done = await data.populateDatabase();
-    if (done) {
-      res.status(201).json({ success: true, status: 201, data: "Database populated." });
-      return;
-    }
+    esclient.count({index: index,type: type})
+    .then(function (response) {
+      COUNT_DOCS = response.body.count;
+      if (COUNT_DOCS == 178) {
+        res.status(403).json({success: false, status: 403, error: `${index} index is already populated.`});
+        return;
+      }
+      const done = data.populateDatabase();
+      if (done) {
+        res.status(201).json({ success: true, status: 201, data: "Database populated." });
+        return;
+      }
+    }, function (error) { 
+    console.trace(error.message)
+    }).catch((err) => {
+    console.log("Elasticsearch ERROR - data not present");
+    }); 
   }
-
   else {
-    res.status(500).json({
+    res.status(409).json({
       error: true,
+      status: 409,
       data: "Somtething went wrong."
     });
   }
@@ -42,27 +54,61 @@ async function populateDB(req, res) {
  * @returns 
  */
 async function clearIndex (req, res, next) {
-  return esclient.deleteByQuery({
-    index: index,
-    type: type,
-    body: {
-        query: {
-            match_all: {}
-        }
+  esclient.count({index: index,type: type})
+  .then(function (response) {
+    COUNT_DOCS = response.body.count;
+    if (COUNT_DOCS == 0) {
+      res.status(403).json({success: false, status: 403, error: `${index} index is already clear.`});
+      return;
     }
-}).then(function (response) {
-  const values  = {
-      took:     response.body.took,
-      timed_out: response.body.timed_out,
-      deleted: response.body.deleted,
-      message: `${index} index cleared succsesfully.`
-    };
-  res.status(200).json({success: true, status: 200, data: {values}});
-}, function (error) {
-    console.trace(error.message)
-}).catch((err) => {
-    console.log("Elasticsearch ERROR - data not present");
-});   
+    return esclient.deleteByQuery({
+      index: index,
+      type: type,
+      body: {
+          query: {
+              match_all: {}
+          }
+      }
+    }).then(function (response) {
+      const values  = {
+          took:     response.body.took,
+          timed_out: response.body.timed_out,
+          deleted: response.body.deleted,
+          message: `${index} index cleared succsesfully.`
+        };
+      res.status(200).json({success: true, status: 200, data: {values}});
+    }, function (error) {
+        console.trace(error.message)
+      }).catch((err) => {
+        console.log("Elasticsearch ERROR - data not present");
+      });  
+  }, function (error) {
+      console.trace(error.message)
+  }).catch((err) => {
+      console.log("Elasticsearch ERROR - data not present");
+  }); 
+  } 
+
+
+
+/**
+ * @function getCount
+ * This function returns the amount of documents in that index
+ * @res -> is the asnwer of the query.
+ * @param {Object} req Express request object
+ * @param {Object} res Express response object
+ * @returns {void}
+ */
+async function getCount(req, res) {
+  return esclient.count({index: index,type: type})
+  .then(function (response) {
+    COUNT_DOCS = response.body.count;
+    res.status(200).json({success: true, status: 200, count: COUNT_DOCS});
+  }, function (error) {
+      console.trace(error.message)
+  }).catch((err) => {
+      console.log("Elasticsearch ERROR - data not present");
+  });  
 }
 
 
@@ -77,11 +123,11 @@ async function clearIndex (req, res, next) {
  * @returns {void}
  */
 async function getCountry(req, res) {
-
   if (!req.query.text) {
-    res.status(422).json({
+    res.status(400).json({
       error: true,
-      data: "Missing required parameter: text or body"
+      status: 400,
+      data: "Missing required parameter: text"
     });
     return;
   }
@@ -142,8 +188,9 @@ async function getCountry(req, res) {
 async function getCountryFromName(req, res) {
 
   if (!req.query.text) {
-    res.status(422).json({
+    res.status(400).json({
       error: true,
+      status: 400,
       data: "Missing required parameter: text"
     });
 
@@ -210,7 +257,7 @@ async function deleteCountry (req, res, next) {
     };
     if (response.body.deleted == 0) {
       data.message = `${req.body.name} was not removed from the index.`;
-      res.status(404).json({success: false, status: 404, data});
+      res.status(400).json({success: false, status: 400, data});
     } else {
       res.status(200).json({success: true,  status: 200, data});
     }
@@ -252,7 +299,7 @@ async function insertNewCountry (req, res, next) {
           data.message = `${req.body.name} was not  sucessfully added to the index.`;
           res.status(400).json({success: false, status: 400, data});
         } else {
-          res.status(200).json({success: true, status: 200, data});
+          res.status(201).json({success: true, status: 201, data});
         }
   }, function (error) {
       console.trace(error.message)
@@ -268,6 +315,7 @@ module.exports = {
   clearIndex,
   getCountry,
   getCountryFromName,
+  getCount,
   deleteCountry,
   insertNewCountry
 };

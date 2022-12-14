@@ -31,18 +31,9 @@ def print_respone(res):
 
 def populateDB():
     if len(params) == 2:
-        url = f'{ENDPOINT}:{PORT}/{DATABASE}/search/name?text=israel'
-        response = requests.get(url, timeout=6).json()
-        if response['success'] == False:
-            url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
-            response = requests.get(url, timeout=6)
-            print_respone(response)
-        else:
-            response ={
-                "success": "false",
-                "error": "Database is already populated"
-            }
-            print(json.dumps(response, indent=4))
+        url = f'{ENDPOINT}:{PORT}/{DATABASE}/data/start'
+        response = requests.get(url, timeout=6)
+        print_respone(response)
     else:
       print("Too much arguments!\n USAGE: python3 app.py populate \n\n")  
 

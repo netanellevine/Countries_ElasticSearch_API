@@ -23,6 +23,11 @@ app.get('/search/point', (req, res) => {
     controller.getCountryFromName(req, res);
  });
 
+    // Get the amount of countries in the countries index
+    app.get('/count', (req, res) => {  
+    controller.getCount(req, res);
+    });
+
     // Delete single country from a given name (as ajson body)
 app.delete('/delete/data', (req, res) => {  
     controller.deleteCountry(req, res);

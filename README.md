@@ -1,6 +1,6 @@
 # Countries_ElasticSearch_API
 
-## Overview 
+# Overview 
 In this project, I created a Rest-API in node.js, Command Line Interface in python and used ElasticSearch as the database.  
 I've created 5 docker containers (elasticsearch, node, python, kibana, logstash) that are interacting within the docker-network.
 The database contains 178 countries as a geojson files and the API allows to perform regular CRUD operations and GET country from a given coordinate.  
